@@ -5,7 +5,7 @@ import mqtt_msg
 import handle_data
 
 
-class Producer(threading.Thread):
+class Receive(threading.Thread):
     def __init__(self, t_name, queue1, clint):
         threading.Thread.__init__(self, name=t_name)
         self.data = queue1
@@ -21,7 +21,7 @@ class Producer(threading.Thread):
         self.cli.loop_forever()
 
 
-class Consumer(threading.Thread):
+class DataHandel(threading.Thread):
     def __init__(self, t_name, queue):
         threading.Thread.__init__(self, name=t_name)
         self.data = queue
@@ -32,14 +32,14 @@ class Consumer(threading.Thread):
                 msg = self.data.get()
                 print('%s %s 出队 %s' % (time.ctime(), self.name, msg))
                 self.data.task_done()
-                time.sleep(2)
+            time.sleep(2)
 
 
 if __name__ == '__main__':
     queue = queue.Queue()
     m_clint = mqtt_msg.connect_mqtt()
-    producer = Producer('producer', queue, m_clint)
-    consumer = Consumer('Consumer', queue)
-    producer.start()
-    consumer.start()
+    receive = Receive('Receive', queue, m_clint)
+    data_Handel = DataHandel('DataHandel', queue)
+    receive.start()
+    data_Handel.start()
     queue.join()
